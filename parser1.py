@@ -1,23 +1,14 @@
+"""
+Matas Stankaitis
+xstankm00
+VUT FIT
+"""
+
 import sys
 from enum import Enum
 import re
 from regexes import *
-"""
-1. Read the source code from the file
-2. Split it into lines
-3. Split each line into tokens (split by whitespace)
-4. Analyse each token
-4.1 If the token is an opcode pass it to the opcode handler
-4.2 If the token is an integer literal pass it to the integer literal handler
-4.3 If the token is a string literal pass it to the string literal handler
-4.4 If the token is a comment pass it to the comment handler
-4.5 If the token is a label pass it to the label handler
-5. opcode handler - check if the opcode is valid and if it is, check operand count
-6. While checking the operand count, check if the operand(token) is valid - passing it to the appropriate handler
-7. If the operand handler return success, and the operand count is correct, the opcode is valid
-8. Move to the next line and repeat the process
 
-"""
 
 class ParsingError(Exception):
     def __init__(self, error_code):
@@ -34,9 +25,12 @@ class ParsingError(Exception):
             self.error_message = "Internal errors."
         else:
             self.error_message = "Unknown error."
+        with open(sys.argv[1] + '.rc', 'w') as file:
+            file.write(str(self.error_code))
 
     def __str__(self):
         return f"Error {self.error_code}: {self.error_message}"
+
 
 class SpecialCharacter(Enum):
     UNDERSCORE = "_"
@@ -44,21 +38,25 @@ class SpecialCharacter(Enum):
     AMPERSAND = "&"
     PERCENT = "%"
 
+
 class TokenType(Enum):
     OPCODE = 1
     VARIABLE = 2
     CONSTANT_INTEGER_LITERAL = 3
     CONSTANT_STRING_LITERAL = 4
     LABEL = 5
-    COMMENT = 6
-    WHITE_SPACE = 7
-    OTHER = 8
+
+class Token:
+    def __init__(self, token_type: TokenType, token_value):
+        self.token_type = token_type
+        self.token_value = token_value
+
 
 class LexicalTokenizer:
     def __init__(self, source_code: str):
         self.source_code: str = source_code
         self.lines: list[str] = source_code.split("\n")
-        self.tokens: list[str] = []
+        self.tokens: list[Token] = []
         self.op_code_handler = {
             "MOV": self.handle_mov_op,
             "ADD": self.handle_add_op,
@@ -80,88 +78,189 @@ class LexicalTokenizer:
         }
         print("LexicalTokenizer created")
 
-    def tokenize(self): #Analyse each token
+    def tokenize(self):  # Analyse each token
         for line in self.lines:
-            self.tokens = line.split()
-            self.line_handler()
-            
+            if(line.startswith("#")):
+                continue
+            token_list: list[str] = line.split()
+            self.line_handler(token_list)
 
-
-    def line_handler(self): #Handle the current line
-        if len(self.tokens) == 0: # If the line is empty, skip it
+    def line_handler(self, token_list: list[str]):  # Handle the current line
+        if len(token_list) == 0:  # If the line is empty, skip it
             return
-        if len(self.tokens) > 4:
+        if len(token_list) > 4:
             raise ParsingError(12)
-        self.handle_opcode()
-            
+        self.handle_opcode(token_list)
 
-    def handle_opcode(self): #Handle the current character as an opcode
-        op_code = self.tokens[0]
-        if op_code.upper not in self.op_code_handler.keys():
+    # Handle the current character as an opcode
+    def handle_opcode(self, token_list: list[str]):
+        op_code = token_list[0]
+        if not op_code.upper() in list(self.op_code_handler.keys()):
             raise ParsingError(11)
-        self.op_code_handler[op_code]()
-    
-    def handle_mov_op(self):
-        if len(self.tokens) != 3:
+        self.tokens.append(Token(TokenType.OPCODE, op_code))
+        self.op_code_handler[op_code.upper()](token_list)
+
+    def handle_mov_op(self, token_list: list[str]):
+        if len(token_list) != 3:
             raise ParsingError(12)
-        # Check if the first operand is a valid variable:
-        if not re.match(VARIABLE_NAME_REGEX, self.tokens[1]):
+        print(token_list[2])
+        # Check if the first operand is valid variable and the second operand is a valid variable or literal:
+        if not(self.check_variable_token(token_list[1]) and (self.check_variable_token(token_list[2]) or self.check_integer_literal_token(token_list[2]) or self.check_string_literal_token(token_list[2]))):
+            raise ParsingError(14)            
+        print("Valid move operation!")
+
+
+    def handle_add_op(self, token_list: list[str]):
+        if len(token_list) != 4:
+            raise ParsingError(12)
+        # Check if the first operand is valid variable and the second operand is a valid variable or literal:
+        if not(self.check_variable_token(token_list[1]) and (self.check_variable_token(token_list[2]) or self.check_integer_literal_token(token_list[2]) or self.check_string_literal_token(token_list[2])) and (self.check_variable_token(token_list[3]) or self.check_integer_literal_token(token_list[3]) or self.check_string_literal_token(token_list[3]))):
             raise ParsingError(14)
+        print("Valid add operation!")
+
+    def handle_sub_op(self, token_list: list[str]):
+        if len(token_list) != 4:
+            raise ParsingError(12)
+        # Check if the first operand is valid variable and the second operand is a valid variable or literal:
+        if not(self.check_variable_token(token_list[1]) and (self.check_variable_token(token_list[2]) or self.check_integer_literal_token(token_list[2]) or self.check_string_literal_token(token_list[2])) and (self.check_variable_token(token_list[3]) or self.check_integer_literal_token(token_list[3]) or self.check_string_literal_token(token_list[3]))):
+            raise ParsingError(14)
+        print("Valid sub operation!")
+
+    def handle_mul_op(self, token_list: list[str]):
+        if len(token_list) != 4:
+            raise ParsingError(12)
+        # Check if the first operand is valid variable and the second operand is a valid variable or literal:
+        if not(self.check_variable_token(token_list[1]) and (self.check_variable_token(token_list[2]) or self.check_integer_literal_token(token_list[2]) or self.check_string_literal_token(token_list[2])) and (self.check_variable_token(token_list[3]) or self.check_integer_literal_token(token_list[3]) or self.check_string_literal_token(token_list[3]))):
+            raise ParsingError(14)
+        print("Valid mul operation!")
+
+    def handle_div_op(self, token_list: list[str]):
+        if len(token_list) != 4:
+            raise ParsingError(12)
+        # Check if the first operand is valid variable and the second operand is a valid variable or literal:
+        if not(self.check_variable_token(token_list[1]) and (self.check_variable_token(token_list[2]) or self.check_integer_literal_token(token_list[2]) or self.check_string_literal_token(token_list[2])) and (self.check_variable_token(token_list[3]) or self.check_integer_literal_token(token_list[3]) or self.check_string_literal_token(token_list[3]))):
+            raise ParsingError(14)         
+        print("Valid div operation!")
+
+    def handle_readint_op(self, token_list: list[str]):
+        if len(token_list) != 2:
+            raise ParsingError(12)
+        # Check if the first operand is valid variable
+        if not self.check_variable_token(token_list[1]):
+            raise ParsingError(14)
+        print("Valid readint operation!")
+        # TODO: read an integer value from the standard input into z:
+
+    def handle_readstr_op(self, token_list: list[str]):
+        if len(token_list) != 2:
+            raise ParsingError(12)
+        # Check if the first operand is valid variable
+        if not self.check_variable_token(token_list[1]):
+            raise ParsingError(14)
+        print("Valid readstr operation!")
+        # TODO: read an string value from the standard input into z:
+
+    def handle_print_op(self, token_list: list[str]):
+        if len(token_list) != 2:
+            raise ParsingError(12)
+        # Check if the first operand is valid variable or literal
+        if not (self.check_variable_token(token_list[1]) or self.check_integer_literal_token(token_list[1]) or self.check_string_literal_token(token_list[1])):
+            raise ParsingError(14)
+        print("Valid readstr operation!")
+        # TODO: print the value of token_list[1] to the standard output without a newline:
+
+    def handle_println_op(self, token_list: list[str]):
+        if len(token_list) != 2:
+            raise ParsingError(12)
+        # Check if the first operand is valid variable or literal
+        if not (self.check_variable_token(token_list[1]) or self.check_integer_literal_token(token_list[1]) or self.check_string_literal_token(token_list[1])):
+            raise ParsingError(14)
+        print("Valid readstr operation!")
+        # TODO: print the value of token_list[1] to the standard output with a newline:
+
+    def handle_label_op(self, token_list: list[str]):
+        if len(token_list) != 2:
+            raise ParsingError(12)
+        # Check if the first operand is valid label
+        if not self.check_label_token(token_list[1]):
+            raise ParsingError(14)
+        print("Valid label operation!")
         
-        pass
+    def handle_jump_op(self, token_list: list[str]):
+        if len(token_list) != 2:
+            raise ParsingError(12)
+        # Check if the first operand is valid label
+        if not self.check_label_token(token_list[1]):
+            raise ParsingError(14)
+        print("Valid jump operation!")
 
-    def handle_add_op(self):
-        pass
-    
-    def handle_sub_op(self):
-        pass
-    
-    def handle_mul_op(self):
-        pass
+    def handle_jumpifeq_op(self, token_list: list[str]):
+        if len(token_list) != 4:
+            raise ParsingError(12)
+        # Check if the first operand is valid label, and the second and third operands are valid variable or literal
+        if not (self.check_label_token(token_list[1]) and (self.check_variable_token(token_list[2]) or self.check_integer_literal_token(token_list[2]) or self.check_string_literal_token(token_list[2])) and (self.check_variable_token(token_list[3]) or self.check_integer_literal_token(token_list[3]) or self.check_string_literal_token(token_list[3]))):
+            raise ParsingError(14)
+        print("Valid jumpifeq operation!")
 
-    def handle_comment(self): #Handle the current character as a comment
-        pass
-    
-    def handle_div_op(self):
-        pass
-    
-    def handle_readint_op(self):
-        pass
-    
-    def handle_readstr_op(self):
-        pass
-    
-    def handle_print_op(self):
-        pass
-    
-    def handle_println_op(self):
-        pass
-    
-    def handle_label_op(self):
-        pass
-    
-    def handle_jump_op(self):
-        pass
-    
-    def handle_jumpifeq_op(self):
-        pass
-    
-    def handle_jumpiflt_op(self):
-        pass
-    
-    def handle_call_op(self):
-        pass
+    def handle_jumpiflt_op(self, token_list: list[str]):
+        if len(token_list) != 4:
+            raise ParsingError(12)
+        # Check if the first operand is valid label, and the second and third operands are valid variable or literal
+        if not (self.check_label_token(token_list[1]) and (self.check_variable_token(token_list[2]) or self.check_integer_literal_token(token_list[2]) or self.check_string_literal_token(token_list[2])) and (self.check_variable_token(token_list[3]) or self.check_integer_literal_token(token_list[3]) or self.check_string_literal_token(token_list[3]))):
+            raise ParsingError(14)
+        print("Valid jumpiflt operation!")
 
-    def handle_return_op(self):
-        pass
+    def handle_call_op(self, token_list: list[str]):
+        if len(token_list) != 2:
+            raise ParsingError(12)
+        # Check if the first operand is valid label
+        if not self.check_label_token(token_list[1]):
+            raise ParsingError(14)
+        print("Valid call operation!")
+
+    def handle_return_op(self, token_list: list[str]):
+        if len(token_list) != 1:
+            raise ParsingError(12)
+        print("Valid return operation!")
+
+    def handle_push_op(self, token_list: list[str]):
+        if len(token_list) != 2:
+            raise ParsingError(12)
+        # Check if the first operand is valid variable or literal
+        if not(self.check_variable_token(token_list[2]) or self.check_integer_literal_token(token_list[2]) or self.check_string_literal_token(token_list[2])):
+            raise ParsingError(14)
+        print("Valid push operation!")
+
+    def handle_pop_op(self, token_list: list[str]):
+        if len(token_list) != 2:
+            raise ParsingError(12)
+        # Check if the first operand is valid variable
+        if not self.check_variable_token(token_list[1]):
+            raise ParsingError(14)
+        print("Valid pop operation!")
+
+    # Check functions for each token type
+    def check_variable_token(self, token: str):
+        if re.fullmatch(VARIABLE_NAME_REGEX, token):
+            return True
+        return False
+
+    def check_integer_literal_token(self, token: str):
+        if re.fullmatch(INTEGER_LITERAL_REGEX, token):
+            return True
+        return False
+
+    def check_string_literal_token(self, token: str):
+        if re.fullmatch(STRING_LITERAL_REGEX, token):
+            return True
+        return False
     
-    def handle_push_op(self):
-        pass
-    
-    def handle_pop_op(self):
-        pass
-    
-    
+    def check_label_token(self, token: str):
+        if re.fullmatch(LABEL_NAME_REGEX, token):
+            return True
+        return False
+
+
 def main():
     if len(sys.argv) != 2:
         print("Error: invalid number of arguments")
@@ -170,5 +269,7 @@ def main():
         source_code = file.read()
         lexicalTokenizer = LexicalTokenizer(source_code)
         lexicalTokenizer.tokenize()
+
+
 if __name__ == '__main__':
     main()
