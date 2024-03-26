@@ -1,35 +1,40 @@
-"""
-After the mandatory XML header5
-, the root element program (including mandatory text attribute
-language with value IPPeCode) follows. The root element consists of elements tac for individual
-instructions. Every tac element includes the mandatory order attribute that holds the order of the
-instruction (unbroken sequence starting with 1, no leading zeros) and the mandatory opcode attribute
-storing the value of operation code always written in upper case. In addition, tac element contains
-the elements for the operands/arguments of the instruction: dst for the destination operand, src1 for
-the potential first source operand and src2 for the second potential operand. The operand elements
-include mandatory attribute type with possible values: integer, string, label, and variable
-determining that the contained textual element represents integer literal, string literal (without the
-surrounding quotation marks), label (including @ at the beginning), or variable name, respectively.
-There is no conversion of the integer values (do not throw away even plus sign) before their write
-up into XML. For string literal, leave escape sequences untouched, convert only colliding characters
-because of XML format (i.e., <, >, & using XML entities &lt;, &gt;, &amp;). Resolve the problematic
-characters in identifiers as well.
-A string literal is just a content of the corresponding XML element with attribute type="string".
-The end of line cannot be represented in a string literal.
-"""
 import xml.etree.ElementTree as ET
-from token_ import TokenType, OperandType, Token
-from lexical_tokenizer import LexicalTokenizer
-from exception_handler import ExceptionHandler
+
+import xml
+from token_ import Token, OperandType, TokenType
 
 from xml.dom import minidom
 
+HEADER = '<?xml version="1.0" encoding="UTF-8"?>'
+DTD = '''<!DOCTYPE program [ 
+  <!ELEMENT program (tac+)>
+  <!ELEMENT tac (dst?,src1?,src2?)>
+  <!ELEMENT dst (#PCDATA)>
+  <!ELEMENT src1 (#PCDATA)>
+  <!ELEMENT src2 (#PCDATA)>
+  <!ATTLIST program name CDATA #IMPLIED>
+  <!ATTLIST tac opcode CDATA #REQUIRED>
+  <!ATTLIST tac order CDATA #REQUIRED>  
+  <!ATTLIST dst type (integer|string|variable|label) #REQUIRED>
+  <!ATTLIST src1 type (integer|string|variable) #REQUIRED>
+  <!ATTLIST src2 type (integer|string|variable) #REQUIRED>
+  <!ENTITY language "IPPeCode">
+  <!ENTITY eol "&#xA;">
+  <!ENTITY lt "&lt;">
+  <!ENTITY gt "&gt;">
+]>'''
+
 
 def generate_xml(tokens: list[Token]):
-    program = ET.Element('program', {'language': 'IPPeCode'})
+    program = ET.Element('program', {
+                         'name': 'Project introduction 1: Print numbers from 1 to 5 (using IPPeCode)'})
+    order: int = 0
     for i, token in enumerate(tokens):
-        tac = ET.SubElement(program, 'tac', {'order': str(
-            i+1), 'opcode': token.token_value.upper()})
+        if token.token_type == TokenType.OPCODE:
+            order += 1
+            tac = ET.SubElement(
+                program, 'tac', {'opcode': token.token_value.upper(), 'order': str(order)})
+            continue
         if token.operand_type == OperandType.DST:
             dst = ET.SubElement(tac, 'dst', {'type': token.token_type.value})
             dst.text = token.token_value
@@ -45,6 +50,16 @@ def generate_xml(tokens: list[Token]):
 
     # Parse the XML string with minidom
     xml_pretty_str = minidom.parseString(xml_string).toprettyxml(indent="  ")
+
+    # Replace the default XML header with the custom one
+    xml_pretty_str = xml_pretty_str.replace(
+        '<?xml version="1.0" ?>', HEADER + '\n' + DTD)
+
+    # Replace colliding characters with their respective entities
+    xml_pretty_str = xml_pretty_str.replace('&amp;', '&')
+    xml_pretty_str = xml_pretty_str.replace('&lt;', '<')
+    xml_pretty_str = xml_pretty_str.replace('&gt;', '>')
+    xml_pretty_str = xml_pretty_str.replace('&quot;', '"')
 
     # Write the pretty XML string to the output file
     with open('output.xml', 'w') as f:

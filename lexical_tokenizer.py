@@ -31,8 +31,17 @@ class LexicalTokenizer():
 
     def tokenize(self):  # Analyse each token
         for line in self.lines:
-            if (line.startswith("#")):
+            if (line.startswith("#")):  # If the line is a comment, skip it
                 continue
+            hashtag_in_quotes = False
+            prev_char = None
+            for i, char in enumerate(line):
+                if char == '"' and prev_char != '\\':
+                    hashtag_in_quotes = not hashtag_in_quotes
+                elif char == '#' and not hashtag_in_quotes:
+                    line = line[:i]
+                    break
+                prev_char = char
             token_list: list[str] = line.split()
             self.line_handler(token_list)
 
