@@ -18,9 +18,8 @@ def main():
         with open(sys.argv[1], "r") as file:
             source_code = file.read()
             lexicalTokenizer = LexicalTokenizer(source_code)
-            lexicalTokenizer.tokenize()
-
-        generate_xml(lexicalTokenizer.tokens)
+            name_of_program = lexicalTokenizer.tokenize()
+        generate_xml(lexicalTokenizer.tokens, name_of_program)
 
         with open(sys.argv[1].removesuffix('.ippecode') + '.rc', 'w') as file:
             file.write('0')

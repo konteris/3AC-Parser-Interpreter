@@ -22,9 +22,9 @@ DTD = '''<!DOCTYPE program [
 ]>'''
 
 
-def generate_xml(tokens: list[Token]):
+def generate_xml(tokens: list[Token], name_of_program: str):
     program = ET.Element('program', {
-                         'name': 'Parser output'})
+                         'name': name_of_program})
     order: int = 0
     for i, token in enumerate(tokens):
         if token.token_type == TokenType.OPCODE:
