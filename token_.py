@@ -1,5 +1,4 @@
 from enum import Enum
-import token
 
 
 class TokenType(Enum):

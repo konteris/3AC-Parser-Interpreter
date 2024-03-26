@@ -1,9 +1,6 @@
 import xml.etree.ElementTree as ET
-
-import xml
-from token_ import Token, OperandType, TokenType
-
 from xml.dom import minidom
+from token_ import Token, OperandType, TokenType
 
 HEADER = '<?xml version="1.0" encoding="UTF-8"?>'
 DTD = '''<!DOCTYPE program [ 
@@ -27,7 +24,7 @@ DTD = '''<!DOCTYPE program [
 
 def generate_xml(tokens: list[Token]):
     program = ET.Element('program', {
-                         'name': 'Project introduction 1: Print numbers from 1 to 5 (using IPPeCode)'})
+                         'name': 'Parser output'})
     order: int = 0
     for i, token in enumerate(tokens):
         if token.token_type == TokenType.OPCODE:
@@ -60,7 +57,7 @@ def generate_xml(tokens: list[Token]):
     xml_pretty_str = xml_pretty_str.replace('&lt;', '<')
     xml_pretty_str = xml_pretty_str.replace('&gt;', '>')
     xml_pretty_str = xml_pretty_str.replace('&quot;', '"')
-
+    xml_pretty_str = xml_pretty_str.replace('\\n;', '$eol;')
     # Write the pretty XML string to the output file
-    with open('output.xml', 'w') as f:
+    with open('out.xml', 'w') as f:
         f.write(xml_pretty_str)
