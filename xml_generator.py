@@ -22,7 +22,7 @@ DTD = '''<!DOCTYPE program [
 ]>'''
 
 
-def generate_xml(tokens: list[Token], name_of_program: str):
+def generate_xml(tokens: list[Token], name_of_program: str) -> str:
     program = ET.Element('program', {
                          'name': name_of_program})
     order: int = 0
@@ -58,6 +58,5 @@ def generate_xml(tokens: list[Token], name_of_program: str):
     xml_pretty_str = xml_pretty_str.replace('&gt;', '>')
     xml_pretty_str = xml_pretty_str.replace('&quot;', '"')
     xml_pretty_str = xml_pretty_str.replace('\\n;', '$eol;')
-    # Write the pretty XML string to the output file
-    with open('out.xml', 'w') as f:
-        f.write(xml_pretty_str)
+
+    return xml_pretty_str

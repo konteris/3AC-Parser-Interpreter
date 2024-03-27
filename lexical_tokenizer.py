@@ -30,10 +30,10 @@ class LexicalTokenizer():
         }
 
     def tokenize(self):  # Analyse each token
-        name_of_program = ""
+        name_of_program = "default_name"
+        if (self.lines[0].startswith("#")):
+            name_of_program = self.lines[0][1:]
         for line in self.lines:
-            if name_of_program == "":
-                name_of_program = line.strip()
             if (line.startswith("#")):  # If the line is a comment, skip it
                 continue
             hashtag_in_quotes = False
