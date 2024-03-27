@@ -19,7 +19,7 @@ class Parser:
             source_code = sys.stdin.read()
             self.source = 'default'
         elif self.source.endswith('.ippecode'):
-            with open(self.source, "r") as file:
+            with open(self.source, "r", encoding='utf-8') as file:
                 source_code = file.read()
         else:
             sys.stderr.write("Invalid source file extension.\n")
@@ -27,19 +27,20 @@ class Parser:
         return source_code
 
     def write_output_file(self, xml_output):
-        with open(self.output, 'w') as file:
+        with open(self.output, 'w', encoding='utf-8') as file:
             file.write(xml_output)
 
     def write_rc_file(self, code):
-        with open(self.source.removesuffix('.ippecode') + '.rc', 'w') as file:
+        with open(self.source.removesuffix('.ippecode') + '.rc', 'w', encoding='utf-8') as file:
             file.write(str(code))
 
     def parse(self):
         try:
             source_code = self.read_source_code()
-            lexicalTokenizer = LexicalTokenizer(source_code)
-            name_of_program = lexicalTokenizer.tokenize()
-            xml_output = generate_xml(lexicalTokenizer.tokens, name_of_program)
+            lexical_tokenizer = LexicalTokenizer(source_code)
+            name_of_program = lexical_tokenizer.tokenize()
+            xml_output = generate_xml(
+                lexical_tokenizer.tokens, name_of_program)
 
             self.write_output_file(xml_output)
             self.write_rc_file('0')
@@ -47,6 +48,7 @@ class Parser:
         except ExceptionHandler as e:
             self.write_rc_file(e.error_code)
         except Exception as e:
+            sys.stderr.write(f"Error: {e}\n")
             self.write_rc_file('19')
         sys.exit(0)
 

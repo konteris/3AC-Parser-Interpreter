@@ -6,7 +6,7 @@
 \"       Match double quote
 """
 
-STRING_LITERAL_REGEX = r'\"(\\.|[^"])*\"' 
+STRING_LITERAL_REGEX = r'\"(\\.|[^"])*\"'
 
 """
 ^        Match at the beginning
