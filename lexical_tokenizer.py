@@ -9,7 +9,7 @@ class LexicalTokenizer():
         self.source_code: str = source_code
         self.lines: list[str] = source_code.split("\n")
         self.tokens: list[Token] = []
-        self.op_code_handler = {
+        self.opcode_handler = {
             "MOV": self.handle_mov_op,
             "ADD": self.handle_add_op,
             "SUB": self.handle_sub_op,
@@ -49,20 +49,19 @@ class LexicalTokenizer():
             self.line_handler(token_list)
         return name_of_program
 
-    def line_handler(self, token_list: list[str]):  # Handle the current line
+    def line_handler(self, token_list: list[str]):
         if len(token_list) == 0:  # If the line is empty, skip it
             return
         if len(token_list) > 4:
             raise ExceptionHandler(12)
         self.handle_opcode(token_list)
 
-    # Handle the current character as an opcode
     def handle_opcode(self, token_list: list[str]):
-        op_code = token_list[0]
-        if not op_code.upper() in list(self.op_code_handler.keys()):
+        opcode = token_list[0]
+        if not opcode.upper() in list(self.opcode_handler.keys()):
             raise ExceptionHandler(11)
-        self.tokens.append(Token(TokenType.OPCODE, None, op_code))
-        self.op_code_handler[op_code.upper()](token_list)
+        self.tokens.append(Token(TokenType.OPCODE, None, opcode))
+        self.opcode_handler[opcode.upper()](token_list)
 
     def handle_mov_op(self, token_list: list[str]):
         if len(token_list) != 3:
@@ -89,6 +88,7 @@ class LexicalTokenizer():
         self.tokens.append(Token(self.determine_token_type(
             token_list[3]), OperandType.SRC2, token_list[3]))
         print("Valid add operation!")
+        # TODO: add the value of the second operand to the value of the third operand and store the result in the first operand.
 
     def handle_sub_op(self, token_list: list[str]):
         if len(token_list) != 4:
@@ -103,6 +103,7 @@ class LexicalTokenizer():
         self.tokens.append(Token(self.determine_token_type(
             token_list[3]), OperandType.SRC2, token_list[3]))
         print("Valid sub operation!")
+        # TODO: subtract the value of the third operand from the value of the second operand and store the result in the first operand.
 
     def handle_mul_op(self, token_list: list[str]):
         if len(token_list) != 4:
@@ -117,6 +118,7 @@ class LexicalTokenizer():
         self.tokens.append(Token(self.determine_token_type(
             token_list[3]), OperandType.SRC2, token_list[3]))
         print("Valid mul operation!")
+        # TODO: multiply the value of the second operand by the value of the third operand and store the result in the first operand.
 
     def handle_div_op(self, token_list: list[str]):
         if len(token_list) != 4:
@@ -131,6 +133,7 @@ class LexicalTokenizer():
         self.tokens.append(Token(self.determine_token_type(
             token_list[3]), OperandType.SRC2, token_list[3]))
         print("Valid div operation!")
+        # TODO: divide the value of the second operand by the value of the third operand and store the result in the first operand. If the third operand is zero, raise an Exception.
 
     def handle_readint_op(self, token_list: list[str]):
         if len(token_list) != 2:
@@ -174,7 +177,7 @@ class LexicalTokenizer():
         self.tokens.append(Token(self.determine_token_type(
             token_list[1]), OperandType.SRC1, token_list[1]))
         print("Valid readstr operation!")
-        # TODO: print the value of token_list[1] to the standard output with a newline:
+        # TODO: print the value of the first operand to the standard output with a newline:
 
     def handle_label_op(self, token_list: list[str]):
         if len(token_list) != 2:
@@ -185,6 +188,7 @@ class LexicalTokenizer():
         self.tokens.append(
             Token(TokenType.LABEL, OperandType.DST, token_list[1]))
         print("Valid label operation!")
+        # TODO: define a label with the name of the first operand:
 
     def handle_jump_op(self, token_list: list[str]):
         if len(token_list) != 2:
@@ -195,6 +199,7 @@ class LexicalTokenizer():
         self.tokens.append(
             Token(TokenType.LABEL, OperandType.DST, token_list[1]))
         print("Valid jump operation!")
+        # TODO: jump to the label with the name of the first operand:
 
     def handle_jumpifeq_op(self, token_list: list[str]):
         if len(token_list) != 4:
@@ -209,6 +214,7 @@ class LexicalTokenizer():
         self.tokens.append(Token(self.determine_token_type(
             token_list[3]), OperandType.SRC2, token_list[3]))
         print("Valid jumpifeq operation!")
+        # TODO: jump to the label with the name of the first operand if the second operand is equal to the third operand:
 
     def handle_jumpiflt_op(self, token_list: list[str]):
         if len(token_list) != 4:
@@ -223,6 +229,7 @@ class LexicalTokenizer():
         self.tokens.append(Token(self.determine_token_type(
             token_list[3]), OperandType.SRC2, token_list[3]))
         print("Valid jumpiflt operation!")
+        # TODO: jump to the label with the name of the first operand if the second operand is less than the third operand:
 
     def handle_call_op(self, token_list: list[str]):
         if len(token_list) != 2:
@@ -233,11 +240,13 @@ class LexicalTokenizer():
         self.tokens.append(
             Token(TokenType.LABEL, OperandType.DST, token_list[1]))
         print("Valid call operation!")
+        # TODO: call the function with the name of the first operand
 
     def handle_return_op(self, token_list: list[str]):
         if len(token_list) != 1:
             raise ExceptionHandler(12)
         print("Valid return operation!")
+        # TODO: return from the function
 
     def handle_push_op(self, token_list: list[str]):
         if len(token_list) != 2:
@@ -248,6 +257,7 @@ class LexicalTokenizer():
         self.tokens.append(Token(self.determine_token_type(
             token_list[1]), OperandType.SRC1, token_list[1]))
         print("Valid push operation!")
+        # TODO: push the value of the first operand to the stack
 
     def handle_pop_op(self, token_list: list[str]):
         if len(token_list) != 2:
@@ -258,6 +268,7 @@ class LexicalTokenizer():
         self.tokens.append(
             Token(TokenType.VARIABLE, OperandType.DST, token_list[1]))
         print("Valid pop operation!")
+        # TODO: pop the value from the stack to the first operand
 
     # Check functions for each token type
     def check_variable_token(self, token: str):
