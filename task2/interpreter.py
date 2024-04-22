@@ -61,7 +61,7 @@ class Interpreter:
                     raise ExceptionHandler(ErrorCodes.INTERNAL_ERROR)
                 if label_name in self.labels:
                     raise ExceptionHandler(ErrorCodes.SEMANTIC_ERROR)
-                self.labels[label_name] = i
+                self.labels[label_name] = i  # Store the index of the label
 
     def handle_mov_op(self, command: ET.Element) -> None:
         dst_element = command.find('dst')
@@ -74,6 +74,7 @@ class Interpreter:
         elif src_element.attrib['type'] == 'variable':
             if src_element.text not in self.variables:
                 raise ExceptionHandler(ErrorCodes.READ_ACCESS_ERROR)
+            # Copy the value of the src variable to the dst variable
             self.variables[dst_element.text] = Variable(
                 self.variables[src_element.text].var_type, self.variables[src_element.text].value)
         else:
@@ -92,7 +93,6 @@ class Interpreter:
 
         # Check that both src1_value and src2_value are integers
         if not isinstance(src1_value, int) or not isinstance(src2_value, int):
-            # Replace with the appropriate error code
             raise ExceptionHandler(ErrorCodes.INCOMPATIBLE_OPERANDS_ERROR)
 
         # Perform the addition and store the result in the dst variable
@@ -112,7 +112,6 @@ class Interpreter:
 
         # Check that both src1_value and src2_value are integers
         if not isinstance(src1_value, int) or not isinstance(src2_value, int):
-            # Replace with the appropriate error code
             raise ExceptionHandler(ErrorCodes.INCOMPATIBLE_OPERANDS_ERROR)
 
         # Perform the subtraction and store the result in the dst variable
@@ -120,11 +119,6 @@ class Interpreter:
             'integer', int(src1_value) - int(src2_value))
 
     def handle_mul_op(self, command: ET.Element) -> None:
-        """
-        Handles multiplication operation.
-        Parameters:
-        command (ET.Element): The XML element containing the command.
-        """
         dst_element = command.find('dst')
         src1_element = command.find('src1')
         src2_element = command.find('src2')
@@ -137,7 +131,6 @@ class Interpreter:
 
         # Check that both src1_value and src2_value are integers
         if not isinstance(src1_value, int) or not isinstance(src2_value, int):
-            # Replace with the appropriate error code
             raise ExceptionHandler(ErrorCodes.INCOMPATIBLE_OPERANDS_ERROR)
 
         # Perform the multiplication and store the result in the dst variable
@@ -157,7 +150,6 @@ class Interpreter:
 
         # Check that both src1_value and src2_value are integers
         if not isinstance(src1_value, int) or not isinstance(src2_value, int):
-            # Replace with the appropriate error code
             raise ExceptionHandler(ErrorCodes.INCOMPATIBLE_OPERANDS_ERROR)
 
         # Check if the division by zero is attempted
@@ -292,7 +284,7 @@ class Interpreter:
             raise ExceptionHandler(ErrorCodes.RUNTIME_ERROR)
         popped_value = self.call_stack.pop()
         if not isinstance(popped_value, int):
-            # Replace with the appropriate error code
+
             raise ExceptionHandler(ErrorCodes.INTERNAL_ERROR)
         self.pc = popped_value
 

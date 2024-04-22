@@ -1,6 +1,12 @@
 import argparse
 import sys
 from interpreter import Interpreter
+from exception_handler import ExceptionHandler
+
+
+def write_rc_file(path: str, code: int):
+    with open(path.removesuffix('.xml') + '.rc', 'w', encoding='utf-8') as file:
+        file.write(str(code))
 
 
 def parse_arguments():
@@ -24,7 +30,16 @@ def main():
         args.input_file = False
     interpreter = Interpreter(
         args.program, args.input_file, args.output)
-    interpreter.start()
+
+    try:
+        interpreter.start()
+    except ExceptionHandler as e:
+        write_rc_file(args.program, e.error_code.value)
+        sys.exit(e.error_code.value)
+    except Exception as e:
+        sys.stderr.write(f"Error: {e}\n")
+        write_rc_file(args.program, 99)
+        sys.exit(99)
 
 
 if __name__ == "__main__":

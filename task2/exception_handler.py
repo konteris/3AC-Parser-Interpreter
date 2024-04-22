@@ -40,4 +40,3 @@ class ExceptionHandler(Exception):
             self.error_message = "Internal errors."
 
         sys.stderr.write(self.error_message + "\n")
-        sys.exit(int(error_code.value))
