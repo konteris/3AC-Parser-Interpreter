@@ -1,0 +1,16 @@
+<program name="Test handle_intstr_op Function">
+  <!-- Define an integer variable -->
+  <tac opcode="MOV" order="1">
+    <dst type="variable">int_var</dst>
+    <src1 type="integer">42</src1>
+  </tac>
+  <!-- Convert the integer to a string -->
+  <tac opcode="INTSTR" order="2">
+    <dst type="variable">str</dst>
+    <src1 type="variable">int_var</src1>
+  </tac>
+  <!-- Print the converted string -->
+  <tac opcode="PRINTLN" order="3">
+    <src1 type="variable">str</src1>
+  </tac>
+</program>

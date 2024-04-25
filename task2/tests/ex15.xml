@@ -1,0 +1,28 @@
+<program name="Jump Conditionals with String Comparison">
+  <tac opcode="READSTR" order="1">
+    <dst type="variable">str1</dst>
+  </tac>
+  <tac opcode="READSTR" order="2">
+    <dst type="variable">str2</dst>
+  </tac>
+  <tac opcode="JUMPIFEQ" order="3">
+    <dst type="label">@strings_equal</dst>
+    <src1 type="variable">str1</src1>
+    <src2 type="variable">str2</src2>
+  </tac>
+  <tac opcode="PRINTLN" order="4">
+    <src1 type="string">Strings are not equal</src1>
+  </tac>
+  <tac opcode="JUMP" order="5">
+    <dst type="label">@end</dst>
+  </tac>
+  <tac opcode="LABEL" order="6">
+    <dst type="label">@strings_equal</dst>
+  </tac>
+  <tac opcode="PRINTLN" order="7">
+    <src1 type="string">Strings are equal</src1>
+  </tac>
+  <tac opcode="LABEL" order="8">
+    <dst type="label">@end</dst>
+  </tac>
+</program>

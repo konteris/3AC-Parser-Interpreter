@@ -1,3 +1,4 @@
+import os
 import argparse
 import sys
 from interpreter import Interpreter
@@ -5,7 +6,8 @@ from exception_handler import ExceptionHandler
 
 
 def write_rc_file(path: str, code: int):
-    with open(path.removesuffix('.xml') + '.rc', 'w', encoding='utf-8') as file:
+    filename = os.path.splitext(path)[0]
+    with open(filename + '.rc', 'w', encoding='utf-8') as file:
         file.write(str(code))
 
 
@@ -28,11 +30,17 @@ def main():
             args.input_file = f.readlines()
     else:
         args.input_file = False
+
+    if args.output != sys.stdout:
+        with open(args.output, 'w', encoding='utf-8') as f:
+            f.write('')
+
     interpreter = Interpreter(
         args.program, args.input_file, args.output)
 
     try:
         interpreter.start()
+        write_rc_file(args.program, 0)
     except ExceptionHandler as e:
         write_rc_file(args.program, e.error_code.value)
         sys.exit(e.error_code.value)

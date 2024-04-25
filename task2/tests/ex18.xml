@@ -1,0 +1,18 @@
+<program name="Test CONCAT Operation">
+  <tac opcode="MOV" order="1">
+    <dst type="variable">str1</dst>
+    <src1 type="string">Hello, </src1>
+  </tac>
+  <tac opcode="MOV" order="2">
+    <dst type="variable">str2</dst>
+    <src1 type="string">World!</src1>
+  </tac>
+  <tac opcode="CONCAT" order="3">
+    <dst type="variable">concat_str</dst>
+    <src1 type="variable">str1</src1>
+    <src2 type="variable">str2</src2>
+  </tac>
+  <tac opcode="PRINTLN" order="4">
+    <src1 type="variable">concat_str</src1>
+  </tac>
+</program>

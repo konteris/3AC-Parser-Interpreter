@@ -1,0 +1,16 @@
+<program name="Test handle_len_op Function">
+  <!-- Define a string variable -->
+  <tac opcode="MOV" order="1">
+    <dst type="variable">str</dst>
+    <src1 type="string">Hello, World!</src1>
+  </tac>
+  <!-- Get the length of the string -->
+  <tac opcode="LEN" order="2">
+    <dst type="variable">length</dst>
+    <src1 type="variable">str</src1>
+  </tac>
+  <!-- Print the length of the string -->
+  <tac opcode="PRINTLN" order="3">
+    <src1 type="variable">length</src1>
+  </tac>
+</program>

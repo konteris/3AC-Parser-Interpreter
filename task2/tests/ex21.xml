@@ -1,0 +1,16 @@
+<program name="Test handle_strint_op Function">
+  <!-- Define a string variable -->
+  <tac opcode="MOV" order="1">
+    <dst type="variable">str</dst>
+    <src1 type="string">42</src1>
+  </tac>
+  <!-- Convert the string to an integer -->
+  <tac opcode="STRINT" order="2">
+    <dst type="variable">integer_var</dst>
+    <src1 type="variable">str</src1>
+  </tac>
+  <!-- Print the converted integer -->
+  <tac opcode="PRINTLN" order="3">
+    <src1 type="variable">integer_var</src1>
+  </tac>
+</program>

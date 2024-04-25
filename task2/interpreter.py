@@ -32,7 +32,12 @@ class Interpreter:
             "CALL": self.handle_call_op,
             "RETURN": self.handle_return_op,
             "PUSH": self.handle_push_op,
-            "POP": self.handle_pop_op
+            "POP": self.handle_pop_op,
+            "CONCAT": self.handle_concat_op,
+            "GETAT": self.handle_getat_op,
+            "LEN": self.handle_len_op,
+            "STRINT": self.handle_strint_op,
+            "INTSTR": self.handle_intstr_op
         }
 
     def start(self) -> None:
@@ -168,7 +173,7 @@ class Interpreter:
             # Read an integer from the input file or stdin
             if self.input_file is False:
                 value = int(input().strip())
-            elif self.input_file is not None and len(self.input_file) > 0 and \
+            elif self.input_file is not False and self.input_file is not None and len(self.input_file) > 0 and \
                     self.input_file_index < len(self.input_file):
                 value = int(self.input_file[self.input_file_index])
                 self.input_file_index += 1
@@ -183,10 +188,11 @@ class Interpreter:
             raise ExceptionHandler(ErrorCodes.INTERNAL_ERROR)
         try:
             # Read a string from the input file or stdin
-            if self.input_file is not None and len(self.input_file) > 0 and \
-                    self.input_file_index < len(self.input_file):
-                value = self.input_file[self.input_file_index]
-                self.input_file_index += 1
+            if self.input_file is not False and self.input_file is not None:
+                if len(self.input_file) > 0 and \
+                        self.input_file_index < len(self.input_file):
+                    value = self.input_file[self.input_file_index]
+                    self.input_file_index += 1
             else:
                 value = input().strip()
         except Exception as exc:
@@ -276,15 +282,14 @@ class Interpreter:
             raise ExceptionHandler(ErrorCodes.INTERNAL_ERROR)
         if dst_element.text not in self.labels:
             raise ExceptionHandler(ErrorCodes.JUMP_CALL_ERROR)
-        self.call_stack.append(self.pc + 1)
+        self.call_stack.append(self.pc)
         self.pc = self.labels[dst_element.text]
 
-    def handle_return_op(self) -> None:
+    def handle_return_op(self, command: ET.Element) -> None:
         if len(self.call_stack) == 0:
             raise ExceptionHandler(ErrorCodes.RUNTIME_ERROR)
         popped_value = self.call_stack.pop()
         if not isinstance(popped_value, int):
-
             raise ExceptionHandler(ErrorCodes.INTERNAL_ERROR)
         self.pc = popped_value
 
@@ -308,6 +313,10 @@ class Interpreter:
         if len(self.data_stack) == 0:
             raise ExceptionHandler(ErrorCodes.POP_ERROR)
         popped_value = self.data_stack.pop()
+        try:
+            popped_value = int(popped_value)
+        except ValueError:
+            pass
         if isinstance(popped_value, int):
             self.variables[dst_element.text] = Variable(
                 'integer', popped_value)
@@ -315,6 +324,68 @@ class Interpreter:
             self.variables[dst_element.text] = Variable('string', popped_value)
         else:
             raise ExceptionHandler(ErrorCodes.INCOMPATIBLE_OPERANDS_ERROR)
+
+    def handle_concat_op(self, command: ET.Element) -> None:
+        dst_element = command.find('dst')
+        src1_element = command.find('src1')
+        src2_element = command.find('src2')
+        if dst_element is None or src1_element is None or src2_element is None:
+            raise ExceptionHandler(ErrorCodes.INTERNAL_ERROR)
+        src1_value = self.get_value(src1_element)
+        src2_value = self.get_value(src2_element)
+        if not isinstance(src1_value, str) or not isinstance(src2_value, str):
+            raise ExceptionHandler(ErrorCodes.INCOMPATIBLE_OPERANDS_ERROR)
+        self.variables[dst_element.text] = Variable(
+            'string', src1_value + src2_value)
+
+    def handle_getat_op(self, command: ET.Element) -> None:
+        dst_element = command.find('dst')
+        src1_element = command.find('src1')
+        src2_element = command.find('src2')
+        if dst_element is None or src1_element is None or src2_element is None:
+            raise ExceptionHandler(ErrorCodes.INTERNAL_ERROR)
+        src1_value = self.get_value(src1_element)
+        src2_value = self.get_value(src2_element)
+        if not isinstance(src1_value, str) or not isinstance(src2_value, int):
+            raise ExceptionHandler(ErrorCodes.INCOMPATIBLE_OPERANDS_ERROR)
+        if src2_value < 0 or src2_value >= len(src1_value):
+            raise ExceptionHandler(ErrorCodes.RUNTIME_ERROR)
+        self.variables[dst_element.text] = Variable(
+            'string', src1_value[src2_value])
+
+    def handle_len_op(self, command: ET.Element) -> None:
+        dst_element = command.find('dst')
+        src1_element = command.find('src1')
+        if dst_element is None or src1_element is None:
+            raise ExceptionHandler(ErrorCodes.INTERNAL_ERROR)
+        src1_value = self.get_value(src1_element)
+        if not isinstance(src1_value, str):
+            raise ExceptionHandler(ErrorCodes.INCOMPATIBLE_OPERANDS_ERROR)
+        self.variables[dst_element.text] = Variable('integer', len(src1_value))
+
+    def handle_strint_op(self, command: ET.Element) -> None:
+        dst_element = command.find('dst')
+        src1_element = command.find('src1')
+        if dst_element is None or src1_element is None:
+            raise ExceptionHandler(ErrorCodes.INTERNAL_ERROR)
+        src1_value = self.get_value(src1_element)
+        if not isinstance(src1_value, str):
+            raise ExceptionHandler(ErrorCodes.INCOMPATIBLE_OPERANDS_ERROR)
+        try:
+            self.variables[dst_element.text] = Variable(
+                'integer', int(src1_value))
+        except ValueError as exc:
+            raise ExceptionHandler(ErrorCodes.RUNTIME_ERROR) from exc
+
+    def handle_intstr_op(self, command: ET.Element) -> None:
+        dst_element = command.find('dst')
+        src1_element = command.find('src1')
+        if dst_element is None or src1_element is None:
+            raise ExceptionHandler(ErrorCodes.INTERNAL_ERROR)
+        src1_value = self.get_value(src1_element)
+        if not isinstance(src1_value, int):
+            raise ExceptionHandler(ErrorCodes.INCOMPATIBLE_OPERANDS_ERROR)
+        self.variables[dst_element.text] = Variable('string', str(src1_value))
 
     def get_value(self, element: ET.Element):
         if element.attrib['type'] == 'integer' and element.text is not None:

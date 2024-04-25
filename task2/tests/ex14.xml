@@ -1,0 +1,42 @@
+<program name="Complex Jump Conditionals Test. Two numbers equality.">
+  <tac opcode="READINT" order="1">
+    <dst type="variable">num1</dst>
+  </tac>
+  <tac opcode="READINT" order="2">
+    <dst type="variable">num2</dst>
+  </tac>
+  <tac opcode="JUMPIFEQ" order='3'>
+    <dst type="label">@num1_equals_num2</dst>
+    <src1 type="variable">num1</src1>
+    <src2 type="variable">num2</src2>
+  </tac>
+  <tac opcode="JUMPIFLT" order="3">
+    <dst type="label">@num1_less_than_num2</dst>
+    <src1 type="variable">num1</src1>
+    <src2 type="variable">num2</src2>
+  </tac>
+  <tac opcode="PRINTLN" order="4">
+    <src1 type="string">Num1 is greater than or equal to Num2</src1>
+  </tac>
+  <tac opcode="JUMP" order="5">
+    <dst type="label">@end</dst>
+  </tac>
+  <tac opcode="LABEL" order="6">
+    <dst type="label">@num1_less_than_num2</dst>
+  </tac>
+  <tac opcode="PRINTLN" order="7">
+    <src1 type="string">Num1 is less than Num2</src1>
+  </tac>
+  <tac opcode="JUMP" order="8">
+    <dst type="label">@end</dst>
+  </tac>
+  <tac opcode="LABEL" order="8">
+    <dst type="label">@num1_equals_num2</dst>
+  </tac>
+  <tac opcode="PRINTLN" order="9">
+    <src1 type="string">Num1 is equal to Num2</src1>
+  </tac>
+  <tac opcode="LABEL" order="8">
+    <dst type="label">@end</dst>
+  </tac>
+</program>
