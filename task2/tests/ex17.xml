@@ -1,0 +1,20 @@
+<program name="Stack Push and Pop with String Variables">
+  <tac opcode="PUSH" order="1">
+    <src1 type="string">Hello</src1>
+  </tac>
+  <tac opcode="PUSH" order="2">
+    <src1 type="string">World</src1>
+  </tac>
+  <tac opcode="POP" order="3">
+    <dst type="variable">popStr1</dst>
+  </tac>
+  <tac opcode="POP" order="4">
+    <dst type="variable">popStr2</dst>
+  </tac>
+  <tac opcode="PRINTLN" order="5">
+    <src1 type="variable">popStr1</src1>
+  </tac>
+  <tac opcode="PRINTLN" order="6">
+    <src1 type="variable">popStr2</src1>
+  </tac>
+</program>

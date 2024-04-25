@@ -1,0 +1,14 @@
+<program name="Invalid Arithmetic Operation">
+  <tac opcode="MOV" order="1">
+    <dst type="variable">result</dst>
+    <src1 type="string">Hello</src1>
+  </tac>
+  <tac opcode="ADD" order="2">
+    <dst type="variable">sum</dst>
+    <src1 type="variable">result</src1>
+    <src2 type="integer">5</src2>
+  </tac>
+  <tac opcode="PRINTLN" order="3">
+    <src1 type="variable">sum</src1>
+  </tac>
+</program>

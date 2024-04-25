@@ -1,0 +1,28 @@
+<program name="Return Call Test">
+  <tac opcode="CALL" order="1">
+    <dst type="label">@function</dst>
+  </tac>
+  <tac opcode="PRINTLN" order="2">
+    <src1 type="string">Returned from function</src1>
+  </tac>
+  <tac opcode="JUMP" order="3">
+    <dst type="label">@end</dst>
+  </tac>
+  <tac opcode="LABEL" order="4">
+    <dst type="label">@function</dst>
+  </tac>
+  <tac opcode="PUSH" order="5">
+    <src1 type="integer">5</src1>
+  </tac>
+  <tac opcode="RETURN" order="6">
+  </tac>
+  <tac opcode="LABEL" order="7">
+    <dst type="label">@end</dst>
+  </tac>
+  <tac opcode="POP" order="8">
+    <dst type="variable">x</dst>
+  </tac>
+    <tac opcode="PRINTLN" order="9">
+        <src1 type="variable">x</src1>
+    </tac>
+</program>

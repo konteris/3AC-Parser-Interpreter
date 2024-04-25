@@ -1,5 +1,6 @@
 import sys
 import argparse
+from tkinter import E
 from lexical_tokenizer import LexicalTokenizer
 from exception_handler import ExceptionHandler
 from xml_generator import generate_xml
@@ -18,11 +19,11 @@ class Parser:
         if self.source == '-':
             source_code = sys.stdin.read()
             self.source = 'default'
-        elif self.source.endswith('.ippecode'):
+        try:
             with open(self.source, "r", encoding='utf-8') as file:
                 source_code = file.read()
-        else:
-            sys.stderr.write("Invalid source file extension.\n")
+        except Exception as e:
+            sys.stderr.write(f"Error: {e}\n")
             sys.exit(1)
         return source_code
 

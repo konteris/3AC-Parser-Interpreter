@@ -1,0 +1,22 @@
+<program name="Test getCharAt Function">
+  <!-- Define a string variable -->
+  <tac opcode="MOV" order="1">
+    <dst type="variable">str</dst>
+    <src1 type="string">Hello, World!</src1>
+  </tac>
+  <!-- Define an integer variable to represent the index -->
+  <tac opcode="MOV" order="2">
+    <dst type="variable">index</dst>
+    <src1 type="integer">12</src1>
+  </tac>
+  <!-- Get the character at the specified index -->
+  <tac opcode="GETAT" order="3">
+    <dst type="variable">char</dst>
+    <src1 type="variable">str</src1>
+    <src2 type="variable">index</src2>
+  </tac>
+  <!-- Print the retrieved character -->
+  <tac opcode="PRINTLN" order="4">
+    <src1 type="variable">char</src1>
+  </tac>
+</program>

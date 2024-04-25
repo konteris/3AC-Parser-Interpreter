@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE program [ 
+  <!ELEMENT program (tac+)>
+  <!ELEMENT tac (dst?,src1?,src2?)>
+  <!ELEMENT dst (#PCDATA)>
+  <!ELEMENT src1 (#PCDATA)>
+  <!ELEMENT src2 (#PCDATA)>
+  <!ATTLIST program name CDATA #IMPLIED>
+  <!ATTLIST tac opcode CDATA #REQUIRED>
+  <!ATTLIST tac order CDATA #REQUIRED>
+  <!ATTLIST dst type (integer|string|variable|label) #REQUIRED>
+  <!ATTLIST src1 type (integer|string|variable) #REQUIRED>
+  <!ATTLIST src2 type (integer|string|variable) #REQUIRED>
+  <!ENTITY language "IPPeCode">
+  <!ENTITY eol "&#xA;">
+  <!ENTITY lt "&lt;">
+  <!ENTITY gt "&gt;">
+]>
+<program name="Should return read access to a non-defined variable error(using &language;)">
+   <tac opcode="PRINT" order="1"><src1 type="variable">x</src1></tac>
+</program> 

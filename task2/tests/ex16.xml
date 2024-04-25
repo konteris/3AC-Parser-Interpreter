@@ -1,0 +1,35 @@
+<program name="Return Calls with Arithmetic Operations">
+  <tac opcode="CALL" order="1">
+    <dst type="label">@calculate_sum</dst>
+  </tac>
+  <tac opcode="PRINTLN" order="2">
+    <src1 type="string">Returned from function, Sum:</src1>
+  </tac>
+  <tac opcode="PRINT" order="3">
+    <src1 type="variable">result</src1>
+  </tac>
+  <tac opcode="JUMP" order="4">
+    <dst type="label">@end</dst>
+  </tac>
+  <tac opcode="LABEL" order="5">
+    <dst type="label">@calculate_sum</dst>
+  </tac>
+  <tac opcode="MOV" order="6">
+    <dst type="variable">num1</dst>
+    <src1 type="integer">10</src1>
+  </tac>
+  <tac opcode="MOV" order="7">
+    <dst type="variable">num2</dst>
+    <src1 type="integer">20</src1>
+  </tac>
+  <tac opcode="ADD" order="8">
+    <dst type="variable">result</dst>
+    <src1 type="variable">num1</src1>
+    <src2 type="variable">num2</src2>
+  </tac>
+  <tac opcode="RETURN" order="9">
+  </tac>
+  <tac opcode="LABEL" order="10">
+    <dst type="label">@end</dst>
+  </tac>
+</program>
