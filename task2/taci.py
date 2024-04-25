@@ -1,3 +1,7 @@
+"""
+Matas Stankaitis | xstankm00
+VUT FIT IPPe
+"""
 import os
 import argparse
 import sys
@@ -19,7 +23,7 @@ def parse_arguments():
     parser.add_argument('--input', dest='input_file', default=sys.stdin,
                         help='Input file with data for READINT and READSTR instructions in the program.')
     parser.add_argument('output', nargs='?', default=sys.stdout,
-                        help='Output file for the texts output by PRINT instructions.')
+                        help='Optional. Output file for the texts output by PRINT instructions.')
     return parser.parse_args()
 
 
@@ -41,6 +45,7 @@ def main():
     try:
         interpreter.start()
         write_rc_file(args.program, 0)
+        sys.exit(0)
     except ExceptionHandler as e:
         write_rc_file(args.program, e.error_code.value)
         sys.exit(e.error_code.value)
